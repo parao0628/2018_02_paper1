@@ -26,7 +26,7 @@ def getBoW(x_data, voca_size):
         bow = np.zeros(voca_size, dtype='float32')
         x_len = len(data)
         for wid in data:
-            bow[wid] = float(data.count(wid))/float(x_len)
+            bow[wid] = float(data.count(wid))#/float(x_len)
         
         x_bow.append(bow)
 
