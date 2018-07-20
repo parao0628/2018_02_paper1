@@ -14,13 +14,13 @@ if __name__ == '__main__':
     
     #hyper params
     parser = argparse.ArgumentParser()
-    parser.add_argument('--hidden', type=int, help='hidden size', default=10)
+    parser.add_argument('--hidden_size', type=int, help='hidden size', default=10)
     parser.add_argument('--epoch', type=int, help='epoch size', default=5)
     parser.add_argument('--batch_size', type=int, help='batch size', default=100)
     parser.add_argument('--class_size', type=int, help='class size', default=4)
     parser.add_argument('--lr', type=float, help='learning rate', default=0.1)
     parser.add_argument('--scope', type=str, help='scope name', default='fasttext')
-    parser.add_argument('--config', type=str, help='gpu or cpu', default='cpu')
+    parser.add_argument('--config', type=str, help='gpu or cpu', default='gpu')
     parser.add_argument('--seed', type=int, help='seed', default=0)
     args = parser.parse_args()
 
@@ -52,6 +52,7 @@ if __name__ == '__main__':
     model = model_class.classifier()
   
     with tf.Session(config=config) as sess: 
+        sess.run(tf.global_variables_initializer())
 	data_idx = {'train':range(len(x_data['train'])), 'test':range(len(x_data['test']))}
 	for ep in range(args.epoch): 
 	    random.shuffle(data_idx['train'])
@@ -64,8 +65,10 @@ if __name__ == '__main__':
 	    	
 		feed_dict = {model.X: x_minibatch, 
 			     model.Y: y_minibatch}
-
-		tra, l = sess.run([model.train, model.loss],feed_dict=feed_dict)
+		tra, l = sess.run([model.train, model.loss], feed_dict=feed_dict)
+		
+		if count % 100 == 0:
+		    print("[%d batch] | loss: %.2f | time: %.2f"%(count, l, time.time()-start))
 	    
 	    result = list()
 	    for count in range(len(data_idx['test'])/args.batch_size+1):
@@ -77,10 +80,10 @@ if __name__ == '__main__':
 		feed_dict = {model.X: x_minibatch, 
 			     model.Y: y_minibatch}
 		
-		pred, loss = sess.run([model.pred, model.loss],feed_dict=feed_dict)
+		pred, loss = sess.run([model.pred, model.loss], feed_dict=feed_dict)
 		result.extend(pred)
 	    
-	    score = accChk(results, y_data['test'])
+	    score = accChk(result, y_data['test'])
 	    print("[%d epoch] | loss: %.2f | time: %.2f"%(ep, loss, time.time()-start))
 	    print("Score: %.2f"%score)
 	     

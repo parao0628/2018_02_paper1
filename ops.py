@@ -15,19 +15,22 @@ def getData(class_size):
     return x_data, y_onehot, word2ID
 
 def getOneHot(data, class_size):
-    onehot = np.zeros((len(data),class_size))
+    onehot = np.zeros((len(data),class_size), dtype='float32')
     onehot[np.arange(len(data)), data] = 1.0
+    
     return onehot
 
 def getBoW(x_data, voca_size):
     x_bow = list()
     for data in x_data:
-	tmp_bow = np.zeros(voca_size)
+	bow = np.zeros(voca_size, dtype='float32')
+	x_len = len(data)
 	for wid in data:
-	    tmp_bow[wid] = data.count(wid)
-	x_bow.append(tmp_bow)
+	    bow[wid] = float(data.count(wid))/float(x_len)
+	
+	x_bow.append(bow)
 
-    return x_bow
+    return np.array(x_bow)
 
 def getMinibatch(x_data, y_data, batch_idx, voca_size):
     mini_x = list()
@@ -37,12 +40,9 @@ def getMinibatch(x_data, y_data, batch_idx, voca_size):
 	mini_x.append(x_data[idx])
 	mini_y.append(y_data[idx])
     
-    #mini_bow = getBoW(mini_x, voca_size)
-    #mini_bow = np.array(mini_bow)
-    mini_x = np.array(mini_x)
-    mini_y = np.array(mini_y)
+    mini_bow = getBoW(mini_x, voca_size)
     
-    return mini_x, mini_y
+    return mini_bow, mini_y
 
 def accChk(result, y_data):
     correct = 0
