@@ -10,7 +10,7 @@ def getData(class_size):
     
     y_onehot = dict()    
     for dtype in y_data:
-	y_onehot[dtype] = getOneHot(y_data[dtype], class_size)
+        y_onehot[dtype] = getOneHot(y_data[dtype], class_size)
 
     return x_data, y_onehot, word2ID
 
@@ -23,12 +23,12 @@ def getOneHot(data, class_size):
 def getBoW(x_data, voca_size):
     x_bow = list()
     for data in x_data:
-	bow = np.zeros(voca_size, dtype='float32')
-	x_len = len(data)
-	for wid in data:
-	    bow[wid] = float(data.count(wid))/float(x_len)
-	
-	x_bow.append(bow)
+        bow = np.zeros(voca_size, dtype='float32')
+        x_len = len(data)
+        for wid in data:
+            bow[wid] = float(data.count(wid))/float(x_len)
+        
+        x_bow.append(bow)
 
     return np.array(x_bow)
 
@@ -37,8 +37,8 @@ def getMinibatch(x_data, y_data, batch_idx, voca_size):
     mini_y = list()
 
     for idx in batch_idx:
-	mini_x.append(x_data[idx])
-	mini_y.append(y_data[idx])
+        mini_x.append(x_data[idx])
+        mini_y.append(y_data[idx])
     
     mini_bow = getBoW(mini_x, voca_size)
     
@@ -50,10 +50,10 @@ def accChk(result, y_data):
     assert tot == len(y_data)
 
     for idx, ans in enumerate(y_data):
-	if result[idx] == ans:
-	    correct += 1
-	else:
-	    continue
+        if ans[result[idx]]==1:
+            correct += 1
+        else:
+            continue
     
     acc = float(correct) / float(tot) * 100
 

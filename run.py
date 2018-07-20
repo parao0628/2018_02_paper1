@@ -27,7 +27,7 @@ if __name__ == '__main__':
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' #tf verbose off(info, warning)
     
     if args.seed == 0:
-	seed = int(time.time())%10000
+        seed = int(time.time())%10000
     random.seed(seed)
     np.random.seed(seed)
     tf.set_random_seed(seed)
@@ -41,10 +41,10 @@ if __name__ == '__main__':
     cpu_config = tf.ConfigProto()
     
     if args.config == 'gpu':
-	config = gpu_config
+        config = gpu_config
     elif args.config == 'cpu':
-	os.environ['CUDA_VISIBLE_DEVICES'] = ''
-	config = cpu_config
+        os.environ['CUDA_VISIBLE_DEVICES'] = ''
+        config = cpu_config
     
     x_data, y_data, word2ID = getData(args.class_size)
 
@@ -53,37 +53,37 @@ if __name__ == '__main__':
   
     with tf.Session(config=config) as sess: 
         sess.run(tf.global_variables_initializer())
-	data_idx = {'train':range(len(x_data['train'])), 'test':range(len(x_data['test']))}
-	for ep in range(args.epoch): 
-	    random.shuffle(data_idx['train'])
-	    start = time.time()
-	    for count in range(len(data_idx['train'])/args.batch_size+1):
-		batch_idx = data_idx['train'][count*args.batch_size:(count+1)*args.batch_size]
-		if not batch_idx:
-		    continue
-		x_minibatch, y_minibatch = getMinibatch(x_data['train'], y_data['train'], batch_idx, len(word2ID))
-	    	
-		feed_dict = {model.X: x_minibatch, 
-			     model.Y: y_minibatch}
-		tra, l = sess.run([model.train, model.loss], feed_dict=feed_dict)
-		
-		if count % 100 == 0:
-		    print("[%d batch] | loss: %.2f | time: %.2f"%(count, l, time.time()-start))
-	    
-	    result = list()
-	    for count in range(len(data_idx['test'])/args.batch_size+1):
-		batch_idx = data_idx['test'][count*args.batch_size:(count+1)*args.batch_size]
-		if not batch_idx:
-		    continue
-		x_minibatch, y_minibatch = getMinibatch(x_data['test'], y_data['test'], batch_idx, len(word2ID))
-		
-		feed_dict = {model.X: x_minibatch, 
-			     model.Y: y_minibatch}
-		
-		pred, loss = sess.run([model.pred, model.loss], feed_dict=feed_dict)
-		result.extend(pred)
-	    
-	    score = accChk(result, y_data['test'])
-	    print("[%d epoch] | loss: %.2f | time: %.2f"%(ep, loss, time.time()-start))
-	    print("Score: %.2f"%score)
-	     
+        data_idx = {'train':range(len(x_data['train'])), 'test':range(len(x_data['test']))}
+        for ep in range(args.epoch): 
+            random.shuffle(data_idx['train'])
+            start = time.time()
+            for count in range(len(data_idx['train'])/args.batch_size+1):
+                batch_idx = data_idx['train'][count*args.batch_size:(count+1)*args.batch_size]
+                if not batch_idx:
+                    continue
+                x_minibatch, y_minibatch = getMinibatch(x_data['train'], y_data['train'], batch_idx, len(word2ID))
+                
+                feed_dict = {model.X: x_minibatch, 
+                             model.Y: y_minibatch}
+                tra, l = sess.run([model.train, model.loss], feed_dict=feed_dict)
+                
+                if count % 100 == 0:
+                    print("[%d batch] | loss: %.2f | time: %.2f"%(count, l, time.time()-start))
+            
+            result = list()
+            for count in range(len(data_idx['test'])/args.batch_size+1):
+                batch_idx = data_idx['test'][count*args.batch_size:(count+1)*args.batch_size]
+                if not batch_idx:
+                    continue
+                x_minibatch, y_minibatch = getMinibatch(x_data['test'], y_data['test'], batch_idx, len(word2ID))
+                
+                feed_dict = {model.X: x_minibatch, 
+                             model.Y: y_minibatch}
+                
+                pred, loss = sess.run([model.pred, model.loss], feed_dict=feed_dict)
+                result.extend(pred)
+            
+            score = accChk(result, y_data['test'])
+            print("[%d epoch] | loss: %.2f | time: %.2f"%(ep, loss, time.time()-start))
+            print("Score: %.2f"%score)
+             
